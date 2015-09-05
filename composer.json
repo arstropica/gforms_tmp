@@ -1,0 +1,20 @@
+{
+    "name": "arstropica/gforms_tmp",
+    "description": "This plugin adds web service functionality to Gravity Forms used to submit applications to the TenStreet API",
+    "keywords": ["OAuth2", "REST", "API", "WordPress"],
+    "homepage": "http://arstropica.com",
+    "time": "2015-08-01",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Akin Williams",
+            "email": "aowilliams@arstropica.com",
+            "homepage": "http://arstropica.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "league/oauth2-client": "1.0.0"
+    }
+
+}

@@ -18,6 +18,11 @@ This plugin adds web service functionality to Gravity Forms used to submit appli
 This plugin adds web service functionality to Gravity Forms used to submit applications to the TenStreet API. It uses an admin site from [arstropica/zf-tenstreet](https://github.com/arstropica/zf-tenstreet) to post entries to the TenStreet SOAP web service.
 
 ## Installation ##
+### Composer ###
+1. Clone the repository
+3. Install dependencies: `php composer.phar install`
+
+### WordPRess ###
 1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the \'Plugins\' menu in WordPress
 
