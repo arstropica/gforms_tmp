@@ -29,7 +29,6 @@ No. You will need to setup the admin site at github.com/arstropica/zf-tenstreet 
 
 
 ## Changelog ##
-## Changelog ##
 
 ### 1.0 ###
 * First commit.
