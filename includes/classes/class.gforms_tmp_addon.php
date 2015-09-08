@@ -65,6 +65,7 @@ if (class_exists("GFForms")) {
          * Constructor
          */
         public function __construct() {
+            $this->_path = self::addon_local_path();
             $this->plugin_path = plugin_dir_path(dirname(dirname(__FILE__)));
 
             parent::__construct();
@@ -87,6 +88,15 @@ if (class_exists("GFForms")) {
             } else {
                 add_action('gform_after_submission', array($this, 'maybe_api_submit'), 10, 2);
             }
+        }
+
+        /**
+         * Get File Local Path
+         * 
+         * @return string
+         */
+        public static function addon_local_path() {
+            return plugin_basename(__FILE__);
         }
 
         /**
