@@ -203,7 +203,7 @@ class GForms_TMP {
 
         if (!$gforms_tmp_admin_restapi_url || !$this->is_valid_url($gforms_tmp_admin_restapi_url) || !$gforms_tmp_admin_api_username || !$gforms_tmp_admin_api_password) {
 
-            update_option('gforms_tmp_active', 0);
+            // update_option('gforms_tmp_active', 0);
         } else {
             try {
                 if ($this->is_valid_url($gforms_tmp_admin_restapi_url)) {

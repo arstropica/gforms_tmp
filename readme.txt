@@ -3,7 +3,7 @@ Contributors: arstropica
 Tags: gravity forms, tenstreet, oauth2
 Requires at least: 4.0
 Tested up to: 4.3
-Stable tag: 1.0
+Stable tag: 1.1
 License: MIT
 
 This plugin adds web service functionality to Gravity Forms used to submit applications to the TenStreet API.
@@ -23,7 +23,9 @@ No. You will need to setup the admin site at github.com/arstropica/zf-tenstreet 
 
 
 == Changelog ==
-== Changelog ==
 
 = 1.0 =
 * First commit.
+
+= 1.1 =
+* Removed disable plugin from failed authorization check.

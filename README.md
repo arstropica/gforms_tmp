@@ -7,7 +7,7 @@
   
 **Tested up to:** 4.3
   
-**Stable tag:** 1.0
+**Stable tag:** 1.1
   
 **License:** MIT
   

@@ -3,7 +3,7 @@
     Plugin Name: TenStreet GravityForms Addon
     Plugin URI: https://arstropica.com
     Description: This plugin adds web service functionality to Gravity Forms used to submit applications to the TenStreet API.
-    Version: 1.0
+    Version: 1.1
     Author: Akin Williams
     Author Email: aowilliams@arstropica.com
     License: GNU General Public License v2 or later
