@@ -1,6 +1,6 @@
 <?php
 
-// TenStreet Admin
+// TMP Admin
 
 class Admin_GForms_TMP extends GForms_TMP {
 
@@ -46,8 +46,8 @@ class Admin_GForms_TMP extends GForms_TMP {
             //this will run when in the WordPress admin
             if (!is_network_admin()) {
 
-                // $this->page_hook = add_menu_page('TenStreet Settings', 'TenStreet', 'manage_options', 'gforms-tmp', array(&$this, 'display_settings_Admin_GForms_TMP'));
-                $this->page_hook = add_submenu_page('edit.php?post_type=tenstreet', 'TenStreet Settings', 'Settings', 'manage_options', 'gforms-tmp', array(&$this, 'display_settings_Admin_GForms_TMP'));
+                // $this->page_hook = add_menu_page('Lead Settings', 'Leads', 'manage_options', 'gforms-tmp', array(&$this, 'display_settings_Admin_GForms_TMP'));
+                $this->page_hook = add_submenu_page('edit.php?post_type=tmpleads', 'Lead Settings', 'Settings', 'manage_options', 'gforms-tmp', array(&$this, 'display_settings_Admin_GForms_TMP'));
             }
 
             add_action('admin_print_scripts-' . $this->page_hook, array(&$this, 'load_admin_scripts_GForms_TMP'));
@@ -246,7 +246,7 @@ class Admin_GForms_TMP extends GForms_TMP {
 
 
 
-        <h2><?php echo __('TenStreet Admin Authorization', 'gforms-tmp'); ?></h2>
+        <h2><?php echo __('Leads Admin Authorization', 'gforms-tmp'); ?></h2>
 
         <br />
 
@@ -268,13 +268,13 @@ class Admin_GForms_TMP extends GForms_TMP {
 
                         <tr>
 
-                            <th scope="row"><?php _e('TenStreet Rest API URL') ?></th>
+                            <th scope="row"><?php _e('Leads Rest API URL') ?></th>
 
                             <td>
 
                                 <input type="text" name="gforms_tmp_admin_restapi_url" id="gforms_tmp_admin_restapi_url" value="<?php echo esc_attr($gforms_tmp_admin_restapi_url); ?>" class="regular-text" size="33" placeholder="http(s)://" />
 
-                                <p class="description">TenStreet Rest API URL. <br /><?php if ($is_multisite) : ?><strong>Do not change this unless you know what you are doing!</strong><?php endif; ?></p>
+                                <p class="description">Leads Rest API URL. <br /><?php if ($is_multisite) : ?><strong>Do not change this unless you know what you are doing!</strong><?php endif; ?></p>
 
 
                             </td>
@@ -339,7 +339,7 @@ class Admin_GForms_TMP extends GForms_TMP {
 
         <hr />
 
-        <h2><?php echo __('TenStreet Client Settings', 'gforms-tmp'); ?></h2>
+        <h2><?php echo __('Lead Client Settings', 'gforms-tmp'); ?></h2>
 
         <br />
 
@@ -355,7 +355,7 @@ class Admin_GForms_TMP extends GForms_TMP {
 
                 <tr>
 
-                    <th scope="row"><?php _e('TenStreet Client Name') ?></th>
+                    <th scope="row"><?php _e('Lead Client Name') ?></th>
 
                     <td>
 
@@ -367,7 +367,7 @@ class Admin_GForms_TMP extends GForms_TMP {
 
                 <tr>
 
-                    <th scope="row"><?php _e('TenStreet Client ID') ?></th>
+                    <th scope="row"><?php _e('Account ID') ?></th>
 
                     <td><input type="text" name="gforms_tmp_admin_client_id" id="gforms_tmp_admin_client_id" value="<?php echo $gforms_tmp_admin_client_id; ?>" size="4" style="width: 50px;" /></td>
 
@@ -438,14 +438,14 @@ class Admin_GForms_TMP extends GForms_TMP {
 
                     var hints = $.map($('#gforms_tmp_active').prop("title").split("."), $.trim);
 
-                    var idx = hints.indexOf("Enter Client ID");
+                    var idx = hints.indexOf("Enter Account ID");
 
                     if (!$(this).val()) {
 
                         $('#gforms_tmp_active').addClass('disabled').attr("disabled", "disabled").removeAttr("checked");
 
                         if (idx < 0) {
-                            hints.push("Enter Client ID");
+                            hints.push("Enter Account ID");
                         }
 
                     } else if ("1" == $("#is_token_authorized").val()) {
@@ -487,7 +487,7 @@ class Admin_GForms_TMP extends GForms_TMP {
         if ($this->is_plugin_activated(false)) {
             if (!class_exists("GFForms")) {
                 $class = "error";
-                $message = "TenStreet GravityForms Addon requires Gravity Forms to function.  Please install and activate Gravity Forms.";
+                $message = "GravityForms Lead Addon requires Gravity Forms to function.  Please install and activate Gravity Forms.";
                 echo"<div class=\"$class\"> <p>$message</p></div>";
             }
         }

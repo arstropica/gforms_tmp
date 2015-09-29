@@ -29,36 +29,6 @@
             "name": "Phone",
             "label": "Phone ",
             "type": "text"
-        },
-        {
-            "name": "Question1",
-            "label": "Question 1",
-            "type": "text"
-        },
-        {
-            "name": "Answer1",
-            "label": "Answer 1",
-            "type": "text"
-        },
-        {
-            "name": "Question2",
-            "label": "Question 2",
-            "type": "text"
-        },
-        {
-            "name": "Answer2",
-            "label": "Answer 2",
-            "type": "text"
-        },
-        {
-            "name": "Question3",
-            "label": "Question 3",
-            "type": "text"
-        },
-        {
-            "name": "Answer3",
-            "label": "Answer 3",
-            "type": "text"
         }
     ]
 }

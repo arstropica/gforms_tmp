@@ -41,13 +41,13 @@ if (class_exists("GFForms")) {
          *
          * @var String 
          */
-        protected $_title = "GravityForms TenStreet Add-on";
+        protected $_title = "GravityForms Lead Add-on";
 
         /**
          *
          * @var String 
          */
-        protected $_short_title = "GForms TenStreet";
+        protected $_short_title = "GForms Leads";
 
         /**
          *
@@ -69,6 +69,7 @@ if (class_exists("GFForms")) {
             $this->plugin_path = plugin_dir_path(dirname(dirname(__FILE__)));
 
             parent::__construct();
+            $this->init();
         }
 
         /**
@@ -109,7 +110,7 @@ if (class_exists("GFForms")) {
             $fields = $this->form_mapping_fields($form);
             return array(
                 array(
-                    "title" => "GravityForms TenStreet Form Settings",
+                    "title" => "GravityForms Lead Form Settings",
                     "fields" => array(
                         array(
                             "label" => "Enable Custom Field Mapping",
@@ -179,22 +180,6 @@ if (class_exists("GFForms")) {
                     $idx = 0;
                     foreach ($api_fields['fields'] as $idx => $field) {
                         switch ($field['name']) {
-                            case 'Answer1':
-                            case 'Answer2':
-                            case 'Answer3':
-                                break;
-                            case 'Question1':
-                            case 'Question2':
-                            case 'Question3':
-                                $possible_value = $question_labels ? array_pop($question_labels) : "";
-                                $select = array_merge($default, array(
-                                    "label" => trim($field['label']),
-                                    "name" => trim($field['name']),
-                                    "tooltip" => "Select Mapping for " . trim($field['label']),
-                                    "default_value" => $possible_value
-                                ));
-                                $settings[$idx] = $select;
-                                break;
                             default:
                                 $select = array_merge($default, array(
                                     "label" => trim($field['label']),
@@ -208,8 +193,6 @@ if (class_exists("GFForms")) {
                     }
                 }
             }
-
-            // echo "<pre>" . print_r($form_fields, true) . "</pre>";
 
             return $settings;
         }
@@ -232,8 +215,6 @@ if (class_exists("GFForms")) {
 
             $form_fields = array();
 
-            $question_labels = array();
-
             if ($form && is_array($form) && isset($form['fields'])) {
                 $idx = 1;
                 foreach ($form['fields'] as $field) {
@@ -249,24 +230,10 @@ if (class_exists("GFForms")) {
                         return $labels;
                     });
 
-                    $question_labels = array_diff($form_fields, $api_field_labels);
-                    $idx = 0;
+                    // $additional_labels = array_diff($form_fields, $api_field_labels);
+
                     foreach ($api_fields['fields'] as $idx => $field) {
-                        switch ($field['name']) {
-                            case 'Answer1':
-                            case 'Answer2':
-                            case 'Answer3':
-                                break;
-                            case 'Question1':
-                            case 'Question2':
-                            case 'Question3':
-                                $possible_value = $question_labels ? array_pop($question_labels) : "";
-                                $settings[$field['name']] = $possible_value;
-                                break;
-                            default:
-                                $settings[$field['name']] = trim($field['label']);
-                                break;
-                        }
+                        $settings[$field['name']] = trim($field['label']);
                     }
                 }
             }
@@ -292,6 +259,24 @@ if (class_exists("GFForms")) {
         }
 
         /**
+         * Remove admin fields from entry array
+         * @param array $entry
+         * 
+         * @return array
+         */
+        protected function clean_entry($entry) {
+            $additional_fields = [
+                'ip',
+                'source_url',
+                'user_agent',
+            ];
+            return array_filter($entry, function($v, $k)
+                    use ($additional_fields) {
+                return is_numeric($k) || in_array($k, $additional_fields);
+            }, ARRAY_FILTER_USE_BOTH);
+        }
+
+        /**
          * Generate Lead Entity from Submission
          * 
          * @param object $entry Submission Entry
@@ -309,13 +294,11 @@ if (class_exists("GFForms")) {
 
             $lead['companyid'] = $gforms_tmp_admin_client_id;
 
-            $lead['formname'] = $form['title'];
-
             $lead['ipaddress'] = rgar($entry, 'ip');
 
             $lead['referrer'] = rgar($entry, 'source_url');
 
-            $lead['timecreated'] = date('Y-m-d\TH:i');
+            $lead['timecreated'] = date('Y-m-d H:i:s');
 
             return $lead;
         }
@@ -329,6 +312,7 @@ if (class_exists("GFForms")) {
          */
         protected function build_submission_detail($entry, $form) {
             $detail = false;
+            $data = $entry;
 
             $map = $this->map_entry_fields($form);
 
@@ -344,31 +328,27 @@ if (class_exists("GFForms")) {
                 "api" => array()
             );
 
+            $entry_ids = [];
+
             foreach ($labels as $id => $label) {
-                $values["form"][$label] = isset($entry[$id]) ? $entry[$id] : null;
+                $values["form"][$label] = isset($data[$id]) ? $data[$id] : null;
+                $entry_ids[$label] = $id;
             }
 
             foreach ($map as $field => $label) {
-                switch ($field) {
-                    case 'Question1':
-                    case 'Question2':
-                    case 'Question3':
-                        $display_value_field = preg_replace('/Question/', 'Answer', $field);
-                        if (isset($values["form"][$label])) {
-                            $values["api"][$field] = $label;
-                            $values["api"][$display_value_field] = $values["form"][$label];
-                        } else {
-                            $values["api"][$field] = null;
-                            $values["api"][$display_value_field] = null;
-                        }
-                        break;
-                    default:
-                        if (isset($values["form"][$label])) {
-                            $values["api"][$field] = $values["form"][$label];
-                        } else {
-                            $values["api"][$field] = null;
-                        }
-                        break;
+                if (isset($values["form"][$label])) {
+                    $values["api"][$field] = $values["form"][$label];
+                    if (isset($entry_ids[$label])) {
+                        unset($entry_ids[$label]);
+                    }
+                } else {
+                    $values["api"][$field] = null;
+                }
+            }
+
+            foreach ($entry_ids as $label => $entry_id) {
+                if (isset($data[$entry_id])) {
+                    $values["api"][$label] = $data[$entry_id];
                 }
             }
 
@@ -377,23 +357,6 @@ if (class_exists("GFForms")) {
             }
 
             return $detail;
-        }
-
-        /**
-         * Generate Form Entity from Submission
-         * 
-         * @param object $entry Submission Entry
-         * @param array $form Form Array
-         * @return array
-         */
-        protected function build_submission_form() {
-            return array(
-                "id" => "",
-                "source" => "",
-                "form" => "",
-                "companyid" => "",
-                "company" => "",
-            );
         }
 
         /**
@@ -410,7 +373,7 @@ if (class_exists("GFForms")) {
 
         /**
          * Conditionally handle API Submission
-         * and create TenStreet Post Type
+         * and create Lead Post Type
          * 
          * @param object $entry Submission Entry
          * @param array $form Form Array
@@ -418,17 +381,16 @@ if (class_exists("GFForms")) {
          */
         public function maybe_api_submit($entry, $form) {
             $gforms_tmp = $this->get_gforms_tmp();
+            $clean = $this->clean_entry($entry);
 
-            $submission = array("lead" => null, "detail" => null, "form" => null);
-            $submission["lead"] = $this->build_submission_lead($entry, $form);
-            $submission["detail"] = $this->build_submission_detail($entry, $form);
-            $submission["form"] = $this->build_submission_form();
+            $lead['lead'] = $this->build_submission_lead($clean, $form);
+            $lead['attributes'] = $this->build_submission_detail($clean, $form);
 
             if ($gforms_tmp->is_plugin_activated(true)) {
-                $post_id = $this->api_submit($submission);
+                $post_id = $this->api_submit($lead);
             } elseif ($gforms_tmp->is_plugin_activated(false)) {
-                $post = $this->get_post_data($submission, null);
-                $meta = $this->get_post_meta($submission, null);
+                $post = $this->get_post_data($lead, null);
+                $meta = $this->get_post_meta($lead, null);
 
                 $post_id = $this->wp_insert_custom_post($post, $meta, false);
             }
@@ -439,10 +401,10 @@ if (class_exists("GFForms")) {
         /**
          * Submit form entry to API
          * 
-         * @param array $submission Form Submission Entry
+         * @param array $lead Form Submission Entry
          * @return int Post ID
          */
-        protected function api_submit($submission) {
+        protected function api_submit($lead) {
 
             $response = null;
 
@@ -459,7 +421,7 @@ if (class_exists("GFForms")) {
                 "timeout" => 60,
                 "redirection" => 60,
                 "body" => array_merge(
-                        $submission, array(
+                        $lead, array(
                     "access_token" => $accessToken->getToken()
                 ))
             );
@@ -480,9 +442,9 @@ if (class_exists("GFForms")) {
                     }
                 }
             }
-
-            $post = $this->get_post_data($submission, $response);
-            $meta = $this->get_post_meta($submission, $response);
+            
+            $post = $this->get_post_data($lead, $response);
+            $meta = $this->get_post_meta($lead, $response);
 
             return $this->wp_insert_custom_post($post, $meta, false);
         }
@@ -515,12 +477,12 @@ if (class_exists("GFForms")) {
          * @param array $submission API Submission Data
          * @return array Post data
          */
-        public function get_post_data($submission, $response = null) {
+        public function get_post_data($lead, $response = null) {
             $post = false;
-            if ($submission && is_array($submission)) {
-                $title = isset($submission['detail']['FirstName'], $submission['detail']['LastName']) ? $submission['detail']['FirstName'] . " " . $submission['detail']['LastName'] : "Unknown Applicant (" . date('F j, Y H:i:s') . ")";
-                $content = $this->build_post_content($submission, $response);
-                $post_type = class_exists('TenStreet_Application') ? \TenStreet_Application::POST_TYPE : 'tenstreet';
+            if ($lead && is_array($lead)) {
+                $title = isset($lead['attributes']['FirstName'], $lead['attributes']['LastName']) ? $lead['attributes']['FirstName'] . " " . $lead['attributes']['LastName'] : "Unknown Applicant (" . date('F j, Y H:i:s') . ")";
+                $content = $this->build_post_content($lead, $response);
+                $post_type = class_exists('TMP_Application') ? \TMP_Application::POST_TYPE : 'tmpleads';
                 $author = get_user_by('email', get_option('admin_email'));
                 $post = array(
                     'post_content' => $content,
@@ -534,32 +496,28 @@ if (class_exists("GFForms")) {
         }
 
         /**
-         * Generate content for TenStreet Post Type
+         * Generate content for Lead Post Type
          * 
-         * @param array $submission API Submission Data
+         * @param array $lead API Submission Data
          * @param array $response API Response Data
-         * @return string TenStreet Post Content
+         * @return string Lead Post Content
          */
-        protected function build_post_content($submission, $response = null) {
+        protected function build_post_content($lead, $response = null) {
             $content = '';
-            if (is_array($submission)) {
-                foreach ($submission as $subtitle => $section) {
+            if (is_array($lead)) {
+                foreach ($lead as $subtitle => $section) {
 
                     switch ($subtitle) {
-                        case 'detail' :
+                        case 'attributes' :
+                            $additional_data = array_diff_key($section, array_flip(['FirstName', 'LastName', 'Email', 'Phone', 'City', 'State']));
                             $content .= '<h3>Applicant Details</h3>';
                             $content .= '<table>';
                             $content .= '<tr><th>Name</th>' . '<td>' . $section['FirstName'] . ' ' . $section['LastName'] . '</th></tr>';
                             $content .= '<tr><th>Email</th>' . '<td>' . $section['Email'] . '</th></tr>';
                             $content .= '<tr><th>Phone</th>' . '<td>' . $section['Phone'] . '</th></tr>';
                             $content .= '<tr><th>Location</th>' . '<td>' . $section['City'] . ', ' . $section['State'] . '</th></tr>';
-                            for ($i = 1; $i < 4; $i ++) {
-                                if (isset($section['Question' . $i])) {
-                                    $content .= '<tr><th>Question ' . $i . '</th>' . '<td>' . $section['Question' . $i] . '</th></tr>';
-                                }
-                                if (isset($section['Answer' . $i])) {
-                                    $content .= '<tr><th>Answer ' . $i . '</th>' . '<td>' . $section['Answer' . $i] . '</th></tr>';
-                                }
+                            foreach ($additional_data as $label => $value) {
+                                $content .= '<tr><th>' . $label . '</th>' . '<td>' . $value . '</th></tr>';
                             }
                             $content .= '</table>';
                             $content .= '<hr />';
@@ -569,7 +527,6 @@ if (class_exists("GFForms")) {
                             $content .= '<h3>Application Details</h3>';
                             $content .= '<table>';
                             $content .= '<tr><th>Company</th>' . '<td>' . $section['company'] . ' (' . $section['companyid'] . ')' . '</th></tr>';
-                            $content .= '<tr><th>Form</th>' . '<td>' . $section['formname'] . '</th></tr>';
                             $content .= '<tr><th>I.P. Address</th>' . '<td>' . $section['ipaddress'] . '</th></tr>';
                             $content .= '<tr><th>Referrer</th>' . '<td>' . $section['referrer'] . '</th></tr>';
                             $content .= '<tr><th>Created</th>' . '<td>' . date('F j, Y H:i:s', strtotime($section['timecreated'])) . '</th></tr>';
@@ -580,12 +537,27 @@ if (class_exists("GFForms")) {
                     }
                 }
 
-                if ($response && is_array($response)) {
-                    $content .= '<h3>TenStreet Details</h3>';
+                if (isset($response['tenstreet']['data']) && is_array($response['tenstreet']['data'])) {
+                    $tenstreet = $response['tenstreet']['data'];
+                    $content .= '<h3>Lead Details</h3>';
                     $content .= '<table>';
-                    $content .= '<tr><th>Application submitted</th>' . '<td>' . ($response['submitted'] ? date('F j, Y H:i:s', strtotime($response['timesubmitted'])) : 'Never') . '</th></tr>';
-                    $content .= '<tr><th>TenStreet Response</th>' . '<td>' . (isset($response['lastresponse']) ? nl2br($response['lastresponse']) : 'N/A') . '</th></tr>';
-                    $content .= '<tr><th>Driver ID</th>' . '<td>' . (isset($response['driverid']) ? $response['driverid'] : '') . '</th></tr>';
+                    if (isset($tenstreet['submitted'])) {
+                        $content .= '<tr><th>Application submitted</th>' . '<td>' . ($tenstreet['submitted'] ? date('F j, Y H:i:s', strtotime($tenstreet['timesubmitted'])) : 'Never') . '</th></tr>';
+                    }
+                    if (isset($tenstreet['lastresponse'])) {
+                        $content .= '<tr><th>API Response</th>' . '<td>' . (isset($tenstreet['lastresponse']) ? nl2br($tenstreet['lastresponse']) : 'N/A') . '</th></tr>';
+                    }
+                    if (isset($tenstreet['driverid'])) {
+                        $content .= '<tr><th>Driver ID</th>' . '<td>' . (isset($tenstreet['driverid']) ? $tenstreet['driverid'] : '') . '</th></tr>';
+                    }
+                    $content .= '</table>';
+                }
+                if (isset($response['email']['data']) && is_array($response['email']['data'])) {
+                    $email = $response['email']['data'];
+                    $content .= '<table>';
+                    if (isset($email['message'])) {
+                        $content .= '<tr><th>Email</th>' . '<td>' . $email['message'] . '</td></tr>';
+                    }
                     $content .= '</table>';
                 }
             }
@@ -596,13 +568,13 @@ if (class_exists("GFForms")) {
         /**
          * Extract data for post meta creation from API Submission data
          * 
-         * @param array $submission API Submission Data
+         * @param array $lead API Submission Data
          * @return array Post Meta data
          */
-        function get_post_meta($submission, $response = null) {
+        function get_post_meta($lead, $response = null) {
             $meta = array();
-            if (is_array($submission)) {
-                foreach ($submission as $subtitle => $section) {
+            if (is_array($lead)) {
+                foreach ($lead as $subtitle => $section) {
                     if (is_array($section)) {
                         foreach ($section as $field => $value) {
                             $meta["{$subtitle}_{$field}"] = $value;
@@ -613,9 +585,14 @@ if (class_exists("GFForms")) {
                 }
 
                 if ($response && is_array($response)) {
-                    $subtitle = "response";
-                    foreach ($response as $field => $value) {
-                        $meta["{$subtitle}_{$field}"] = $value;
+                    foreach ($response as $subtitle => $section) {
+                        if (isset($section['data']) && is_array($section['data'])) {
+                            foreach ($section['data'] as $field => $value) {
+                                $meta["response_{$subtitle}_{$field}"] = $value;
+                            }
+                        } else {
+                            $meta["response_{$subtitle}"] = $section;
+                        }
                     }
                 }
             }

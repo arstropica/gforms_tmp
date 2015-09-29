@@ -53,9 +53,9 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
         if (is_network_admin()) {
 
-            $this->page_hook = add_menu_page('TenStreet Network Settings', 'TenStreet', 'manage_network_options', $this::slug, array(&$this, 'display_settings_Network_Admin_GForms_TMP'));
+            $this->page_hook = add_menu_page('Leads Network Settings', 'Leads', 'manage_network_options', $this::slug, array(&$this, 'display_settings_Network_Admin_GForms_TMP'));
 
-            add_submenu_page($this::slug, 'TenStreet Network Settings', 'Settings', 'manage_network_options', 'admin.php?page=' . $this::slug . '&t=settings');
+            add_submenu_page($this::slug, 'TMP Network Settings', 'Settings', 'manage_network_options', 'admin.php?page=' . $this::slug . '&t=settings');
 
             add_action('load-' . $this->page_hook, array($this, 'setup_page_Network_Admin_GForms_TMP'));
         }
@@ -264,7 +264,7 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
                     <h2>
 
-                        <?php \_e('TenStreet Network Settings', 'gforms-tmp') ?>
+                        <?php \_e('Lead Network Settings', 'gforms-tmp') ?>
 
                         <?php
                         if (isset($_REQUEST['s']) && $_REQUEST['s']) {
@@ -345,9 +345,9 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
         $is_token_authorized = $this->is_api_authorized_GForms_TMP(true);
 
         if ($is_token_authorized) {
-            $messages[1] = __('You are authorized to use the TenStreet API.');
+            $messages[1] = __('You are authorized to use the Target Media Partners Leads API.');
         } else {
-            $messages[0] = __('You are not authorized to use the TenStreet API. Authorize using the form below.');
+            $messages[0] = __('You are not authorized to use the Target Media Partners Leads API. Authorize using the form below.');
         }
 
         if (!empty($messages)) {
@@ -604,9 +604,9 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
         }
 
         if ($is_token_authorized) {
-            $messages[] = __('You are authorized to use the TenStreet API.');
+            $messages[] = __('You are authorized to use the Target Media Partners Leads API.');
         } else {
-            $messages[] = __('You are not authorized to use the TenStreet API. Authorize using the form below.');
+            $messages[] = __('You are not authorized to use the Target Media Partners Leads API. Authorize using the form below.');
         }
 
         if (!empty($messages)) {
@@ -632,13 +632,13 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
                 <tr class="form-required">
 
-                    <th scope="row"><?php _e('TenStreet REST API URL') ?></th>
+                    <th scope="row"><?php _e('Target Media Partners REST API URL') ?></th>
 
                     <td>
 
                         <input type="text" name="gforms_tmp_admin_restapi_url" id="gforms_tmp_admin_restapi_url" value="<?php echo esc_attr($gforms_tmp_admin_restapi_url); ?>" class="regular-text" placeholder="http(s)://" <?php disabled($is_token_authorized); ?> />
 
-                        <p class="description">TenStreet REST API URL. <br /><strong>Do not change this unless you know what you are doing!</strong></p>
+                        <p class="description">Target Media Partners REST API URL. <br /><strong>Do not change this unless you know what you are doing!</strong></p>
 
                     </td>
 
@@ -651,7 +651,7 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
                         <input type="text" id="gforms_tmp_admin_api_username" name="gforms_tmp_admin_api_username" value="<?php echo $gforms_tmp_admin_api_username; ?>" class="regular-text" <?php disabled($is_token_authorized); ?> />
 
-                        <p class="description">Enter TenStreet API Username.</p>
+                        <p class="description">Enter Target Media Partners API Username.</p>
 
                     </td>
 
@@ -662,7 +662,7 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
                         <input type="password" id="gforms_tmp_admin_api_password" name="gforms_tmp_admin_api_password" value="<?php echo $gforms_tmp_admin_api_password; ?>" class="regular-text" <?php disabled($is_token_authorized); ?> />
 
-                        <p class="description">Enter TenStreet API Key.</p>
+                        <p class="description">Enter Target Media Partners API Key.</p>
 
                     </td>
 
@@ -742,8 +742,8 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
         $sites_columns = array(
             'cb' => '<input type="checkbox" />',
             'blogname' => $blogname_columns,
-            'tenstreet_client_id' => __('TenStreet Client ID'),
-            'tenstreet_client_name' => __('TenStreet Client Name'),
+            'tenstreet_client_id' => __('Target Media Partners Client ID'),
+            'tenstreet_client_name' => __('Target Media Partners Client Name'),
             'enable_api' => __('Plugin Activated'),
             'tmp_updated' => __('Last Updated')
         );
