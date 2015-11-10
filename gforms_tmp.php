@@ -3,7 +3,7 @@
     Plugin Name: Target Media Parters GravityForms Addon
     Plugin URI: https://arstropica.com
     Description: This plugin adds web service functionality to Gravity Forms used to submit applications to the Target Media Parters API.
-    Version: 2.2
+    Version: 2.4
     Author: Akin Williams
     Author Email: aowilliams@arstropica.com
     License: GNU General Public License v2 or later

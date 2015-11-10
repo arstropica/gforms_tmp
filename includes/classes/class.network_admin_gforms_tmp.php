@@ -33,6 +33,12 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 				$this,
 				'settings_update_Network_Admin_GForms_TMP' 
 		) );
+		
+		// Add Network Notices
+		add_action( 'network_admin_notices', array (
+				$this,
+				'notices_Network_Admin_GForms_TMP' 
+		) );
 	}
 	
 	/**
@@ -108,8 +114,8 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 	function menu_label_Network_Admin_GForms_TMP() {
 		global $menu;
 		global $submenu;
-		if (isset($submenu['gforms-tmp'][0][0])) {
-			$submenu['gforms-tmp'][0][0] = "Sites";
+		if (isset( $submenu ['gforms-tmp'] [0] [0] )) {
+			$submenu ['gforms-tmp'] [0] [0] = "Sites";
 		}
 	}
 	
@@ -383,6 +389,27 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 	}
 	
 	/**
+	 * Add Admin Notices
+	 *
+	 * @return void
+	 */
+	function notices_Network_Admin_GForms_TMP() {
+		if ($this->is_plugin_activated( false )) {
+			if (! class_exists( "GFForms" )) {
+				$class = "error";
+				$message = "GravityForms Lead Addon requires Gravity Forms to function.  Please install and activate Gravity Forms.";
+				echo "<div class=\"$class\"> <p>$message</p></div>";
+			}
+		}
+		
+		if (! $this->is_plugin_activated( true )) {
+			$class = "error";
+			$message = "The Target Media Partners Leads Plugin is not authorized or is inactive.  Please <a href=\"" . network_admin_url( 'admin.php?page=' . $this::slug . '&t=settings' ) . "\">activate</a> so that Leads can be submitted.";
+			echo "<div class=\"$class\"> <p>$message</p></div>";
+		}
+	}
+	
+	/**
 	 * Display Network Section of Settings Page
 	 */
 	function network_settings_Network_Admin_GForms_TMP() {
@@ -423,7 +450,8 @@ class Network_Admin_GForms_TMP extends Admin_GForms_TMP {
 
 </form>
 
-<form action="<?php echo network_admin_url('admin.php?page=' . $this::slug); ?>"
+<form
+	action="<?php echo network_admin_url('admin.php?page=' . $this::slug); ?>"
 	class="network_admin_gforms_tmp-settings" method="post">
 
 	<input type="hidden" name="action"

@@ -107,7 +107,7 @@ class Admin_GForms_TMP_OAuth extends GForms_TMP {
 		return $is_multisite ? update_site_option( 'gforms_tmp_access_token', $token ) : update_option( 'gforms_tmp_access_token', $token );
 	}
 	private function is_json($string) {
-		json_decode( $string );
+		@json_decode( $string );
 		return (json_last_error() == JSON_ERROR_NONE);
 	}
 }

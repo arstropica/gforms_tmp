@@ -11,7 +11,7 @@ access_token = tmp_api.gapi_access_token;
 jQuery(document).ready(function($) {
 	nonce = $('INPUT#gforms_tmp_google_oauth').val();
 	state = {
-		origin : 'wptest.tmpadmin-tenstreet.com',
+		origin : document.location.hostname,
 		referrer : window.location.href,
 		id : nonce
 	};
